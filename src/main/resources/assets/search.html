@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Author Lookup</title>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            background-color: white;
+            overflow-x: hidden;
+        }
+        .outer {
+            display: table;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+        .middle {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .inner {
+            margin-left: 100px;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="outer">
+
+    <div class="middle">
+
+        <div class="inner">
+
+            <SCRIPT charset="utf-8" id="profiles-widget" type="text/javascript">
+
+                (function() {
+                    
+                    // css
+                    var css_tag = document.createElement('link');
+                    css_tag.setAttribute("type","text/css");
+                    css_tag.setAttribute("rel","stylesheet");
+                    css_tag.setAttribute("href","https://cdn.sencha.com/ext/gpl/4.2.1/resources/css/ext-all-gray.css");
+                    (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(css_tag);
+                    
+                    // insert widget div after this script
+                    var widget_div = document.createElement('div');
+                    widget_div.setAttribute("id","profiles-widget-container");
+                    widget_div.setAttribute("scoped","scoped");
+                    var current_script = document.getElementById("profiles-widget");
+                    current_script.parentNode.insertBefore(widget_div, current_script.nextSibling);
+
+
+                    var grid_div = document.createElement('div');
+                    grid_div.setAttribute("id","results-grid");
+                    grid_div.setAttribute("scoped","scoped");
+                    current_script.parentNode.appendChild(grid_div);
+                    
+                    // Localize Ext variable
+                    var EXT = { buildSettings: { "scopeResetCSS": true } };
+
+                    /******** Load EXT if not present *********/
+                    if (window.EXT === undefined || window.EXT.version !== '4.1.1a') {
+                        var script_tag = document.createElement('script');
+                        script_tag.setAttribute("type","text/javascript");
+                        script_tag.setAttribute("src", "https://cdn.sencha.com/ext/gpl/4.2.1/ext-all-debug.js");
+                        if (script_tag.readyState) {
+                            script_tag.onreadystatechange = function () { // For old versions of IE
+                                if (this.readyState == 'complete' || this.readyState == 'loaded') {
+                                    scriptLoadHandler();
+                                }
+                            };
+                        } else {
+                            script_tag.onload = scriptLoadHandler;
+                        }
+                        (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
+
+                    } else {
+                        // The EXT version on the window is the one we want to use
+                        EXT = window.EXT;
+                        main();
+                    }
+
+                    function parseQuery ( query ) {
+                        var Params = new Object ();
+                        if ( ! query ) return Params; // return empty object
+                        var Pairs = query.split(/[;&]/);
+                        for ( var i = 0; i < Pairs.length; i++ ) {
+                            var KeyVal = Pairs[i].split('=');
+                            if ( ! KeyVal || KeyVal.length != 2 ) continue;
+                            var key = unescape( KeyVal[0] );
+                            var val = unescape( KeyVal[1] );
+                            val = val.replace(/\+/g, ' ');
+                            Params[key] = val;
+                        }
+                        return Params;
+                    }
+
+                    function renderUrl(value){
+                        myURL = '';
+                        if(value !== ''){
+                            myURL = '<a href="' + value + '" target="_blank">' + value +'</a>';
+                        }
+                        return myURL;
+                    }
+
+                    /******** Called once EXT has loaded ******/
+                    function scriptLoadHandler() {
+                        // Call our main function
+                        main();
+                    }
+
+                    /******** Our main function ********/
+                    function main() {
+                        Ext.require([
+                            'Ext.grid.*',
+                            'Ext.data.*',
+                            'Ext.panel.*',
+                            'Ext.layout.container.Border'
+                        ]);
+
+                        Ext.onReady(function () {
+
+                            var required = '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>',
+                                    win;
+
+                            Ext.QuickTips.init();
+                            Ext.form.Field.prototype.msgTarget = 'side';
+
+
+                            Ext.define('profile',{
+                                extend: 'Ext.data.Model',
+                                fields: ['id', 'type', 'label', 'link', 'affiliation', 'works']
+                            });
+
+                            var sentDS = Ext.create('Ext.data.Store', {
+                                model: 'profile',
+                                proxy: {
+                                    type: 'ajax',
+                                    url: '/profiles',
+                                    reader: {
+                                        type: 'json',
+                                        root: 'data'
+                                    }
+                                },
+                                pageParam: false,
+                                startParam: false,
+                                limitParam: false,
+                                noCache: true
+                            });
+
+                            sentGrid = new Ext.grid.GridPanel({
+                                store: sentDS,
+                                columns: [{
+                                    header: 'Type',
+                                    width: 100,
+                                    sortable: true,
+                                    dataIndex: 'type'
+                                },{
+                                    id: 'id',
+                                    header: 'ID',
+                                    width: 150,
+                                    sortable: true,
+                                    dataIndex: 'id'
+
+                                },{
+                                    header: 'Label',
+                                    width: 150,
+                                    sortable: true,
+                                    dataIndex: 'label'
+                                },{
+                                    header: 'Link',
+                                    width: 400,
+                                    sortable: true,
+                                    dataIndex: 'link',
+                                    renderer: renderUrl
+                                },{
+                                    header: 'Affiliation',
+                                    width: 200,
+                                    sortable: true,
+                                    dataIndex: 'affiliation'
+                                },{
+                                    header: 'Works',
+                                    width: 50,
+                                    sortable: true,
+                                    dataIndex: 'works'
+                                }],
+
+                                stripeRows: true,
+                                border: true,
+                                height: 450,
+                                width: 1050,
+                                autoScroll: true,
+                                loadMask: {
+                                    msg: 'Searching...',
+                                }
+                            });
+                            //sentGrid.render('results-grid');
+
+
+                            simpleForm = new Ext.FormPanel({
+                                renderTo: 'profiles-widget-container',
+                                collapsible: true,
+                                frame: true,
+                                title: 'Author Profiles',
+                                bodyStyle: 'padding:5px 5px 0;',
+                                width: 1060,
+
+                                defaultType: 'textfield',
+                                // layout: {
+                                //     type: 'hbox'
+                                // },
+                                items: [{
+                                    afterLabelTextTpl: required,
+                                    fieldLabel: 'First Name',
+                                    name: 'givenname',
+                                    allowBlank: false
+                                },{
+                                    afterLabelTextTpl: required,
+                                    fieldLabel: 'Last Name',
+                                    name: 'surname',
+                                    allowBlank: false,
+                                    margins: '0 0 0 25'
+                                },
+                                    sentGrid
+                                ],
+                                buttons: [{
+                                    text: 'Search',
+                                    handler: function () {
+                                        sentGrid.getStore().removeAll();
+                                        sentGrid.getStore().load({
+                                            params: simpleForm.getForm().getValues()
+                                        });
+                                    }
+                                },
+                                    {
+                                        text: 'Clear',
+                                        handler: function () {
+                                            simpleForm.getForm().reset();
+                                            if (sentGrid) {
+                                                sentGrid.getStore().removeAll();
+                                            }
+                                        }
+                                    }]
+                            });
+
+                        });
+
+                    } // main
+
+
+                })();
+            </SCRIPT>
+
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
