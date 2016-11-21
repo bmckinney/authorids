@@ -1,11 +1,12 @@
 # Author Identifiers
-===============
 
 An API-driven application to search for common researcher and author identifiers.
 
-## Getting Started
+## Getting started
 
-### On a Mac Using [Homebrew](http://brew.sh/)
+This project requires Java, Maven and Git. Follow the instructions below to install these tools.
+
+### On a Mac using [Homebrew](http://brew.sh/)
 
 `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
 
@@ -19,14 +20,16 @@ An API-driven application to search for common researcher and author identifiers
 
 `brew install git`
 
-## Build
+## Clone the project using git
+
+`git clone https://github.com/xhanin/restx-singlejar.git`
+
+## Build the project using Maven
 
 `mvn package`
 
-## Run
+## Run the project using Java
 
 `java -jar target/authorids-0.1-SNAPSHOT.jar`
 
-Then go to:
-
-[http://localhost:7777/search.html](http://localhost:7777/search.html)
+Open the application in your browser: [http://localhost:7777/search.html](http://localhost:7777/search.html)
