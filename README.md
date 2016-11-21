@@ -22,7 +22,7 @@ This project requires Java, Maven and Git. Follow the instructions below to inst
 
 ## Clone the project using git
 
-`git clone https://github.com/xhanin/restx-singlejar.git`
+`git clone https://github.com/bmckinney/authorids.git`
 
 ## Build the project using Maven
 
