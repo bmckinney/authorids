@@ -2,6 +2,8 @@
 
 An API-driven application to search for common researcher and author identifiers.
 
+![screenshot](https://dl.dropboxusercontent.com/u/1443678/authorids/screenshot.png)
+
 ## Getting started
 
 This project requires Java, Maven and Git. Follow the instructions below to install these tools.
